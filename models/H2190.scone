@@ -1,0 +1,18 @@
+
+ModelHyfydy {
+	model_file = H2190.hfd
+	
+	# Set initial state
+	state_init_file = InitStateGait10.zml
+	fixed_control_step_size = 0.005
+	initial_equilibration_activation = 0.01
+	zero_velocity_equilibration = 1
+	use_opensim_activation_dynamics = 1
+	use_omnidirectional_root_dofs = 1
+	enable_external_forces = 1
+	EffortMeasure {
+		name = Effort
+		weight = 1.0
+		measure_type = Uchida2016
+	}
+}
