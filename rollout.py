@@ -21,14 +21,14 @@ def make_env():
 def run(name):
     eval_env = DummyVecEnv([make_env()])
 
-    result_dir = RESULT_DIR / name / "checkpoints"
-    vecnormalize_path = result_dir / f"sac_model_vecnormalize_10000_steps.pkl"
+    result_dir = RESULT_DIR / name
+    vecnormalize_path = result_dir / f"final_model_vecnormalize.pkl"
 
     eval_env = VecNormalize.load(vecnormalize_path, eval_env)
     eval_env.training = False
     eval_env.norm_reward = False
 
-    model_path = result_dir / f"sac_model_10000_steps.zip"
+    model_path = result_dir / f"final_model.zip"
     model = SAC.load(model_path, device='auto')
 
     eval_env.envs[0].store_next_episode()

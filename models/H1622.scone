@@ -1,0 +1,4 @@
+ModelHyfydy {
+	model_file = H1622.hfd
+	state_init_file = InitStateJump.zml
+}
