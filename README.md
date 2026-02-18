@@ -11,3 +11,6 @@ python train.py
 ```
 python rollout.py [filename]
 ```
+
+## Environment create and set
+conda create --name hfd_test python=3.9
