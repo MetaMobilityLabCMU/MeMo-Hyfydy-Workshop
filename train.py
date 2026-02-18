@@ -17,7 +17,7 @@ RESULT_DIR = BASE / "results"
 PARAMS_DIR = BASE / "params"
 
 save_name = datetime.datetime.now().strftime("%H-%M-%S")
-n_envs = 48
+n_envs = 30
 
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
     def func(progress_remaining: float) -> float:
@@ -27,7 +27,7 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 
 def make_env():
     def _init():
-        env = gym.make('scone_env-v0')
+        env = gym.make('H0918-v0')
         env.render_mode = getattr(env, "render_mode", "rgb_array")
         return env
     return _init
@@ -67,7 +67,7 @@ def get_model(config):
         tensorboard_log=os.path.join(RESULT_DIR / save_name, "tensorboard_log"),
         verbose=1,
         device="auto",
-        use_sde=True,
+        use_sde=False,
         sde_sample_freq=-1)
     return model
 
