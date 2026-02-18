@@ -112,7 +112,7 @@ class SconeEnv(gym.Env):
 
 
     def _get_reward(self) -> float:
-        reward = self._bodies['torso'].com_pos().y
+        reward = self._bodies['torso'].com_vel().y
         return reward
     
 
