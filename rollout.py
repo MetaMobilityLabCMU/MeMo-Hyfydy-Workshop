@@ -1,5 +1,4 @@
 import gym
-import sconegym
 import yaml
 from argparse import ArgumentParser
 from pathlib import Path
@@ -13,7 +12,7 @@ PARAMS_DIR = BASE / "params"
 
 def make_env():
     def _init():
-        env = gym.make('scone_env-v0')
+        env = gym.make('H0918-v0')
         env.render_mode = getattr(env, "render_mode", "rgb_array")
         return env
     return _init
