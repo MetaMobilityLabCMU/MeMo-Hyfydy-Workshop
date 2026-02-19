@@ -4,6 +4,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from stable_baselines3 import SAC
 from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
+import numpy as np
 import env
 
 BASE = Path(__file__).resolve().parent
@@ -38,6 +39,7 @@ def run(name):
 
     while not done[0]:
         action, _ = model.predict(obs, deterministic=True)
+        # action = np.zeros(eval_env.action_space.shape)
         obs, reward, done, info = eval_env.step(action)
         ep_reward += reward[0]
         ep_steps += 1

@@ -17,12 +17,7 @@ RESULT_DIR = BASE / "results"
 PARAMS_DIR = BASE / "params"
 
 save_name = datetime.datetime.now().strftime("%H-%M-%S")
-n_envs = 30
-
-def linear_schedule(initial_value: float) -> Callable[[float], float]:
-    def func(progress_remaining: float) -> float:
-        return progress_remaining * initial_value
-    return func
+n_envs = 48
 
 
 def make_env():
@@ -52,23 +47,17 @@ def get_model(config):
     model = SAC(
         "MlpPolicy",
         train_env,
-        learning_rate=linear_schedule(config['lr_schedule']),
+        learning_rate=config['lr'],
         buffer_size=config['buffer_size'],
-        learning_starts=config['learning_starts'],
         batch_size=config['batch_size'],
         tau=config['tau'],
         gamma=config['gamma'],
         train_freq=config['train_freq'],
         gradient_steps=config['gradient_steps'],
         target_update_interval=config['target_update_interval'],
-        ent_coef="auto",
-        target_entropy="auto",
         policy_kwargs=policy_kwargs,
         tensorboard_log=os.path.join(RESULT_DIR / save_name, "tensorboard_log"),
-        verbose=1,
-        device="auto",
-        use_sde=False,
-        sde_sample_freq=-1)
+        verbose=1,)
     return model
 
 

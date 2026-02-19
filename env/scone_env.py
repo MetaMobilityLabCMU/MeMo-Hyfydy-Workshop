@@ -9,6 +9,11 @@ np.random.seed(None)
 class SconeEnv(gym.Env):
 
     def __init__(self, **kwargs):
+        """
+        Initialize environment.
+        You can add any class variables here.
+        """
+
         super().__init__()
 
         # Initialize sconepy model
@@ -21,9 +26,8 @@ class SconeEnv(gym.Env):
         self.episode = 0
         self.total_reward = 0
         self.step_size = 0.1 # 10 Hz
-        self.max_step_size = int(3 / self.step_size) # default 3 seconds
+        self.max_step_size = int(2 / self.step_size) # default 3 seconds
         self.store_next = False
-        self._bodies = {body.name(): body for body in self.model.bodies()}
         
         # Set action/observation space dimensions
         act_dim = len(self.model.actuators())
@@ -36,7 +40,12 @@ class SconeEnv(gym.Env):
         
     
     def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
-        # Reset environment
+        """
+        Resets environment.
+        Returns initial observation.
+        """
+
+        # Initialize environment and variables
         self.model.reset()
         self.model.set_store_data(self.store_next)
         self.total_reward = 0.0
@@ -47,7 +56,7 @@ class SconeEnv(gym.Env):
         muscle_activations = np.ones((len(self.model.muscles()),)) * 0.01
         self.model.init_muscle_activations(muscle_activations)
 
-        # Equilibrate forces
+        # Adjust model vertical displacement to 10% of body weight
         self.model.adjust_state_for_load(0.1)
 
         # Get initial observation
@@ -57,7 +66,13 @@ class SconeEnv(gym.Env):
     
 
     def step(self, action):
+        """
+        Takes action inside the Hyfydy simulation and returns:
+        (obs, reward, terminated, truncated, info).
+        """
+
         self.steps += 1
+        self.time += self.step_size
 
         # Set muscle excitation from action
         action = np.clip(action, -1.0, 1.0)
@@ -65,7 +80,6 @@ class SconeEnv(gym.Env):
         self.model.set_actuator_inputs(action)
         
         # Step simulation env
-        self.time += self.step_size
         self.model.advance_simulation_to(self.time)
         
         # Get observation and reward
@@ -90,43 +104,43 @@ class SconeEnv(gym.Env):
         return obs, reward, terminated, truncated, info
     
 
-    def _get_obs(self) -> np.ndarray:        
-        # Muscles
-        m_fibl = self.model.muscle_fiber_length_array()
-        m_fibv = self.model.muscle_fiber_velocity_array()
-        m_force = self.model.muscle_force_array()
-        m_exc = self.model.muscle_excitation_array()
-        acts = self.model.muscle_activation_array()
+    def _get_obs(self) -> np.ndarray:
+        """
+        Returns observation vector.
+        This vector goes into the neural networks.
+        """
 
-        # Get model kinematics
-        dof_pos = self.model.dof_position_array().copy()
-        dof_vel = self.model.dof_velocity_array().copy()
+        # TODO: Give useful observations to the model
+        NotImplemented
         
-        # Concat all observations
-        obs = np.concatenate([
-            m_fibl, m_fibv, m_force, m_exc, acts,
-            dof_pos, dof_vel
-        ], dtype=np.float32)
-
-        return obs
+        return np.array([0])
 
 
     def _get_reward(self) -> float:
-        reward = self._bodies['torso'].com_vel().y
-        return reward
+        """ Returns scaler reward of the step. """
+
+        # TODO: Design reward function!
+        NotImplemented
+
+        return 0.0
     
 
     def _is_terminated(self) -> bool:
+        """ Checks episode termination. """
+
+        # TODO: (optional) Set early termination condition
+
         return False
 
 
     def _is_truncated(self) -> bool:
+        """ Checks if the episode reached max steps. """
         if self.steps >= self.max_step_size:
             return True
         return False
     
 
     def store_next_episode(self):
+        """ Set save conditions of the next episode. """
         self.store_next = True
         self.reset()
-    
