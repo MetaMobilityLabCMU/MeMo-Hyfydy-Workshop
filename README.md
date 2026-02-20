@@ -1,6 +1,7 @@
 # MeMo-Hyfydy-Workshop
 
 ## Setting up the environment
+Run these commands in terminal:
 ```
 conda create --name hfd_env python=3.9
 conda activate hfd_env
