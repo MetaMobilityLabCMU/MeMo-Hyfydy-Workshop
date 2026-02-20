@@ -5,6 +5,9 @@
 conda create --name hfd_env python=3.9
 conda activate hfd_env
 pip install -r requirements.txt
+cd sconegym_main
+pip install -e .
+cd ..
 ```
 
 ## Testing the environment

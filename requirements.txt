@@ -8,3 +8,4 @@ tensorboard-data-server==0.7.2
 torch==2.8.0
 torchvision==0.23.0
 tqdm==4.67.1
+pyyaml
