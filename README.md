@@ -10,11 +10,6 @@ pip install -e .
 cd ..
 ```
 
-## Testing the environment
-```
-python test_env.py
-```
-
 ## Training model
 ```
 python train.py

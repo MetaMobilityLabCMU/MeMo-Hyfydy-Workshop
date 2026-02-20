@@ -17,7 +17,7 @@ RESULT_DIR = BASE / "results"
 PARAMS_DIR = BASE / "params"
 
 save_name = datetime.datetime.now().strftime("%H-%M-%S")
-n_envs = 48
+n_envs = 32
 
 
 def make_env():
@@ -32,8 +32,7 @@ def get_env():
     train_env = make_vec_env(
         make_env(), 
         n_envs=n_envs, 
-        vec_env_cls=SubprocVecEnv, 
-        vec_env_kwargs=dict(start_method='fork'))
+        vec_env_cls=SubprocVecEnv)
     train_env = VecMonitor(train_env)
     train_env = VecNormalize(train_env, norm_obs=True, norm_reward=False)
 
