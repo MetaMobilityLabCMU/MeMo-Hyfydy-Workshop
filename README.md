@@ -10,6 +10,10 @@ cd sconegym_main
 pip install -e .
 cd ..
 ```
+And try running:
+```
+python train.py
+```
 
 ## Training model
 ```
