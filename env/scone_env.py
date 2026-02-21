@@ -6,6 +6,7 @@ from sconegym_main.sconetools import sconepy
 
 np.random.seed(None)
 
+
 class SconeEnv(gym.Env):
 
     def __init__(self, **kwargs):
@@ -18,27 +19,35 @@ class SconeEnv(gym.Env):
 
         # Initialize sconepy model
         sconepy.set_log_level(3)
-        self.model = sconepy.load_model(kwargs['model_file'])
+        self.model = sconepy.load_model(kwargs["model_file"])
+
+        body_list = self.model.bodies()
+        self.bodies = {}
+        for body in body_list:
+            self.bodies[body.name()] = body
+        self.bodies["torso"].com_pos()
 
         # Initiallize variables
         self.steps = 0
         self.time = 0
         self.episode = 0
         self.total_reward = 0
-        self.step_size = 0.1 # 10 Hz
-        self.max_step_size = int(2 / self.step_size) # default 3 seconds
+        self.step_size = 0.1  # 10 Hz
+        self.max_step_size = int(2 / self.step_size)  # default 3 seconds
         self.store_next = False
-        
+
         # Set action/observation space dimensions
         act_dim = len(self.model.actuators())
-        self.action_space = Box(low=-np.ones(act_dim, dtype=np.float32),
-                                high=np.ones(act_dim, dtype=np.float32),
-                                dtype=np.float32)
+        self.action_space = Box(
+            low=-np.ones(act_dim, dtype=np.float32),
+            high=np.ones(act_dim, dtype=np.float32),
+            dtype=np.float32,
+        )
         dummy_obs = self._get_obs()
-        self.observation_space = Box(low=-np.inf, high=np.inf,
-                                     shape=dummy_obs.shape, dtype=np.float32)
-        
-    
+        self.observation_space = Box(
+            low=-np.inf, high=np.inf, shape=dummy_obs.shape, dtype=np.float32
+        )
+
     def reset(self, *, seed: Optional[int] = None, options: Optional[dict] = None):
         """
         Resets environment.
@@ -63,7 +72,6 @@ class SconeEnv(gym.Env):
         obs = self._get_obs()
         info = {}
         return obs, info
-    
 
     def step(self, action):
         """
@@ -76,16 +84,16 @@ class SconeEnv(gym.Env):
 
         # Set muscle excitation from action
         action = np.clip(action, -1.0, 1.0)
-        action = 0.5 * (action + 1.0) # map [-1, 1] to [0, 1]
+        action = 0.5 * (action + 1.0)  # map [-1, 1] to [0, 1]
         self.model.set_actuator_inputs(action)
-        
+
         # Step simulation env
         self.model.advance_simulation_to(self.time)
-        
+
         # Get observation and reward
         obs = self._get_obs()
         reward = self._get_reward()
-        
+
         # Check episode end
         terminated = self._is_terminated()
         truncated = self._is_truncated()
@@ -97,12 +105,13 @@ class SconeEnv(gym.Env):
         if self.done:
             self.episode += 1
             if self.store_next:
-                self.model.write_results(sconepy.replace_string_tags("DATE_TIME."),
-                                         f"{self.total_reward:.3f}")
+                self.model.write_results(
+                    sconepy.replace_string_tags("DATE_TIME."),
+                    f"{self.total_reward:.3f}",
+                )
                 self.store_next = False
-        
+
         return obs, reward, terminated, truncated, info
-    
 
     def _get_obs(self) -> np.ndarray:
         """
@@ -111,36 +120,37 @@ class SconeEnv(gym.Env):
         """
 
         # TODO: Give useful observations to the model
-        NotImplemented
-        
-        return np.array([0])
-
+        return np.concatenate(
+            [
+                self.model.actuator_input_array(),
+                self.model.dof_position_array(),
+                self.model.dof_velocity_array(),
+            ]
+        )
 
     def _get_reward(self) -> float:
-        """ Returns scaler reward of the step. """
+        """Returns scaler reward of the step."""
 
         # TODO: Design reward function!
-        NotImplemented
-
-        return 0.0
-    
+        # Bodies ['ground', 'pelvis', 'femur_r', 'tibia_r', 'calcn_r', 'femur_l', 'tibia_l', 'calcn_l', 'torso']
+        breakpoint()
+        return self.model.com_vel().y
 
     def _is_terminated(self) -> bool:
-        """ Checks episode termination. """
+        """Checks episode termination."""
 
-        # TODO: (optional) Set early termination condition
+        if self.model.com_vel().y < 0.0:
+            return True
 
         return False
 
-
     def _is_truncated(self) -> bool:
-        """ Checks if the episode reached max steps. """
+        """Checks if the episode reached max steps."""
         if self.steps >= self.max_step_size:
             return True
         return False
-    
 
     def store_next_episode(self):
-        """ Set save conditions of the next episode. """
+        """Set save conditions of the next episode."""
         self.store_next = True
         self.reset()
