@@ -1,4 +1,4 @@
 ModelHyfydy {
 	model_file = H0918.hfd
-	state_init_file = InitState.zml
+	state_init_file = InitStateJump.zml
 }
