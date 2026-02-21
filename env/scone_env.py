@@ -32,8 +32,8 @@ class SconeEnv(gym.Env):
         self.time = 0
         self.episode = 0
         self.total_reward = 0
-        self.step_size = 0.1  # 10 Hz
-        self.max_step_size = int(2 / self.step_size)  # default 3 seconds
+        self.step_size = 0.1 # 10 Hz
+        self.max_step_size = int(1.0 / self.step_size) # default 0.8 seconds
         self.store_next = False
 
         # Set action/observation space dimensions

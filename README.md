@@ -24,3 +24,7 @@ python train.py
 ```
 python rollout.py [filename]
 ```
+[filename] is the generated folder name in /results
+
+## sconpy documentation
+https://scone.software/doku.php?id=doc:sconepy
