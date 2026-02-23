@@ -25,15 +25,14 @@ class SconeEnv(gym.Env):
         self.bodies = {}
         for body in body_list:
             self.bodies[body.name()] = body
-        self.bodies["torso"].com_pos()
 
         # Initiallize variables
         self.steps = 0
         self.time = 0
         self.episode = 0
         self.total_reward = 0
-        self.step_size = 0.1 # 10 Hz
-        self.max_step_size = int(1.0 / self.step_size) # default 0.8 seconds
+        self.step_size = 0.1  # 10 Hz
+        self.max_step_size = int(1.0 / self.step_size)  # default 0.8 seconds
         self.store_next = False
 
         # Set action/observation space dimensions
@@ -133,13 +132,12 @@ class SconeEnv(gym.Env):
 
         # TODO: Design reward function!
         # Bodies ['ground', 'pelvis', 'femur_r', 'tibia_r', 'calcn_r', 'femur_l', 'tibia_l', 'calcn_l', 'torso']
-        breakpoint()
-        return self.model.com_vel().y
+        return self.bodies["torso"].com_pos().y**2 + self.bodies["torso"].com_vel().y**2 
 
     def _is_terminated(self) -> bool:
         """Checks episode termination."""
 
-        if self.model.com_vel().y < 0.0:
+        if self.bodies["torso"].com_vel().y < 0.0:
             return True
 
         return False
